@@ -39,7 +39,7 @@ func main() {
 
 	// Send the actions
 	if *action == "authorize" {
-		WsClient.WriteMessage <- `[2, "1234", "Authorize", { "idTag": { "id": "11234" } }]`
+		WsClient.WriteMessage <- `[2, "1234", "Authorize", { "idTag": { "id": "1" } }]`
 	}
 
 	// Do not terminate
