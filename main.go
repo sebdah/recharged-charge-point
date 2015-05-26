@@ -41,7 +41,7 @@ func main() {
 	if *action == "authorize" {
 		WsClient.WriteMessage <- `[2, "1234", "Authorize", { "idTag": { "id": "1" } }]`
 	} else if *action == "bootnotification" {
-		WsClient.WriteMessage <- `[2, "1234", "BootNotification", { "model": "Model X", "vendor": "Vendor Y"}]`
+		WsClient.WriteMessage <- `[2, "1234", "BootNotification", { "chargePointModel": "Model X", "chargePointVendor": "Vendor Y"}]`
 	}
 
 	// Do not terminate
