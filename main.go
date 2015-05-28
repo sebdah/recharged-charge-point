@@ -35,17 +35,9 @@ func main() {
 	log.Debug("Connecting to %s over websockets", wsEndpoint.String())
 	WsClient = websockets.NewClient(wsEndpoint)
 
-	// Make sure to send heartbeats via websocket pings
-	ticker := time.NewTicker(time.Duration(config.Config.GetInt("central-system.heartbeat-interval") * int(time.Second)))
-	for {
-		select {
-		case <-ticker.C:
-			WsClient.PingMessage <- ""
-		}
-	}
-
 	// Start the websockets communicator
 	go websocketsCommunicator()
+	go websocketPinger()
 
 	// Send the actions
 	if *action == "authorize" {
@@ -70,5 +62,17 @@ func websocketsCommunicator() {
 		recv_msg = <-WsClient.ReadMessage
 
 		log.Info("Received message: %s\n", recv_msg)
+	}
+}
+
+// Send heartbeats via websocket pings
+func websocketPinger() {
+	WsClient.SendPing("")
+	ticker := time.NewTicker(time.Duration(config.Config.GetInt("central-system.heartbeat-interval") * int(time.Second)))
+	for {
+		select {
+		case <-ticker.C:
+			WsClient.SendPing("")
+		}
 	}
 }
