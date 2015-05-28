@@ -41,11 +41,11 @@ func main() {
 
 	// Send the actions
 	if *action == "authorize" {
-		WsClient.WriteMessage <- `[2, "1234", "Authorize", { "idTag": { "id": "1" } }]`
+		WsClient.WriteChannel <- `[2, "1234", "Authorize", { "idTag": { "id": "1" } }]`
 	} else if *action == "bootnotification" {
-		WsClient.WriteMessage <- `[2, "1234", "BootNotification", { "chargePointModel": "Model X", "chargePointVendor": "Vendor Y"}]`
+		WsClient.WriteChannel <- `[2, "1234", "BootNotification", { "chargePointModel": "Model X", "chargePointVendor": "Vendor Y"}]`
 	} else if *action == "datatransfer" {
-		WsClient.WriteMessage <- `[2, "1234", "DataTransfer", { "vendorId": "1234" }]`
+		WsClient.WriteChannel <- `[2, "1234", "DataTransfer", { "vendorId": "1234" }]`
 	}
 
 	// Do not terminate
@@ -59,7 +59,7 @@ func websocketsCommunicator() {
 	var recv_msg string
 
 	for {
-		recv_msg = <-WsClient.ReadMessage
+		recv_msg = <-WsClient.ReadChannel
 
 		log.Info("Received message: %s\n", recv_msg)
 	}
