@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/url"
+	"time"
 
 	goLogging "github.com/op/go-logging"
 	"github.com/sebdah/recharged-charge-point/config"
@@ -22,17 +23,26 @@ func main() {
 
 	log.Info("Starting re:charged charge-point simulator")
 	log.Info("Environment: %s", config.Env)
+	log.Info("Service port: %d", config.Config.GetInt("port"))
 
 	// Parse command line options
 	action := flag.String("action", "", "OCPP action")
 	flag.Parse()
 
 	// Connect to the WebSockets endpoint
-	log.Info("port: %d", config.Config.GetInt("port"))
-	log.Info(config.Config.GetString("central-system.endpoint-ocpp20j"))
+	log.Debug("Central-system endpoint: %s", config.Config.GetString("central-system.endpoint-ocpp20j"))
 	wsEndpoint, _ := url.Parse(config.Config.GetString("central-system.endpoint-ocpp20j"))
 	log.Debug("Connecting to %s over websockets", wsEndpoint.String())
 	WsClient = websockets.NewClient(wsEndpoint)
+
+	// Make sure to send heartbeats via websocket pings
+	ticker := time.NewTicker(time.Duration(config.Config.GetInt("central-system.heartbeat-interval") * int(time.Second)))
+	for {
+		select {
+		case <-ticker.C:
+			WsClient.PingMessage <- ""
+		}
+	}
 
 	// Start the websockets communicator
 	go websocketsCommunicator()

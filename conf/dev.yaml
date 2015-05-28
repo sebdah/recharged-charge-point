@@ -1,3 +1,4 @@
 port: 6000
 central-system:
     endpoint-ocpp20j: "http://localhost:5000/ocpp-2.0j/ws"
+    heartbeat-interval: 10
